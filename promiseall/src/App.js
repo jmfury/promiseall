@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-
-// import axios from "axios";
 import Suite from "./Suite";
 
 function App() {
@@ -12,60 +10,29 @@ function App() {
     }
   ]);
   const [suiteContent, setContent] = useState([]);
-  const fetchData = async () => {
-    let data;
-    await fetch("http://100.115.92.195:5000/", {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }).then(res => {
-      return (data = res.json());
-    });
-    // console.log("data", await data);
+  const fetchData = fetch("http://100.115.92.195:5000/", {
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }).then(res => {
+    return res.json();
+  });
 
-    setSuites(await data);
-  };
+  const fetchContent = fetch("http://100.115.92.195:4000/", {
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }).then(res => {
+    return res.json();
+  });
 
-  const fetchContent = async () => {
-    let data;
-    await fetch("http://100.115.92.195:4000/", {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    }).then(res => {
-      return (data = res.json());
-    });
-
-    setContent(await data);
-  };
   const fetchBoth = async () => {
-    let content;
-    let suites;
-    Promise.all([
-      await fetch("http://100.115.92.195:4000/", {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }).then(res => {
-        return (content = res.json());
-      }),
-      await fetch("http://100.115.92.195:5000/", {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }).then(res => {
-        return (suites = res.json());
-      })
-    ]);
-    setSuites(await suites);
-    setContent(await content);
+    Promise.all([fetchData, fetchContent]).then(values => {
+      setSuites(values[0]);
+      setContent(values[1]);
+    });
   };
-  // useEffect(() => {
-  //   fetchData();
-  // }, []);
-  // useEffect(() => {
-  // fetchContent();
-  // }, []);
+
   useEffect(() => {
     fetchBoth();
   }, []);
@@ -91,16 +58,8 @@ function App() {
                 ).detail
               )
             }
-            // suiteDetails={
-            //   state.suiteContent.find(
-            //     content => content.suiteCode === suite.suiteCode
-            //   ).detail || ""
-            // }
           />
         ))}
-      {/* {suiteContent.map(content => (
-        <li key={content.suiteCode}>{content.detail}</li>
-      ))} */}
     </ul>
   );
 }
